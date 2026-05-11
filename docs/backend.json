@@ -1,0 +1,122 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Represents a user's profile in the application.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "ownerUid": { "type": "string" },
+        "role": { "type": "string", "enum": ["woman", "man", "admin"] },
+        "email": { "type": "string", "format": "email" },
+        "name": { "type": "string" },
+        "points": { "type": "number" },
+        "rating": { "type": "number" },
+        "reviewCount": { "type": "number" },
+        "likesCount": { "type": "number" },
+        "level": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "isVerified": { "type": "boolean" },
+        "photoUrl": { "type": "string" },
+        "city": { "type": "string" },
+        "whatsappNumber": { "type": "string" },
+        "maritalStatus": { "type": "string" }
+      },
+      "required": ["uid", "ownerUid", "role", "email", "name", "createdAt"]
+    },
+    "Post": {
+      "title": "Social Post",
+      "description": "A post shared on the community feed.",
+      "type": "object",
+      "properties": {
+        "creatorUid": { "type": "string" },
+        "creatorName": { "type": "string" },
+        "text": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "likesCount": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["creatorUid", "creatorName", "text", "createdAt"]
+    },
+    "Story": {
+      "title": "Story",
+      "description": "A temporary photo story visible for 24 hours.",
+      "type": "object",
+      "properties": {
+        "creatorUid": { "type": "string" },
+        "creatorName": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "expiresAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["creatorUid", "imageUrl", "createdAt", "expiresAt"]
+    },
+    "Review": {
+      "title": "Review & Complaint",
+      "description": "A review or complaint left by a user after a rendezvous.",
+      "type": "object",
+      "properties": {
+        "fromUid": { "type": "string" },
+        "fromName": { "type": "string" },
+        "targetUid": { "type": "string" },
+        "targetName": { "type": "string" },
+        "rendezvousId": { "type": "string" },
+        "stars": { "type": "number", "minimum": 1, "maximum": 5 },
+        "text": { "type": "string" },
+        "isComplaint": { "type": "boolean" },
+        "status": { "type": "string", "enum": ["pending", "investigating", "resolved"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["fromUid", "targetUid", "stars", "text", "createdAt"]
+    },
+    "WithdrawalRequest": {
+      "title": "Withdrawal Request",
+      "description": "A request to convert points into real money.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "points": { "type": "number" },
+        "amount": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "processed", "rejected"] },
+        "paymentMethod": { "type": "string" },
+        "paymentInfo": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "points", "amount", "status", "paymentInfo", "createdAt"]
+    }
+  },
+  "auth": {
+    "providers": ["email"]
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/backend/entities/UserProfile" },
+      "description": "Public user profile information."
+    },
+    "/posts/{postId}": {
+      "schema": { "$ref": "#/backend/entities/Post" },
+      "description": "Community posts feed."
+    },
+    "/stories/{storyId}": {
+      "schema": { "$ref": "#/backend/entities/Story" },
+      "description": "Ephemeral stories."
+    },
+    "/withdrawals/{withdrawalId}": {
+      "schema": { "$ref": "#/backend/entities/WithdrawalRequest" },
+      "description": "Points to cash withdrawal requests."
+    },
+    "/reviews/{reviewId}": {
+      "schema": { "$ref": "#/backend/entities/Review" },
+      "description": "User reviews and complaints."
+    },
+    "/rendezvous/{rendezvousId}": {
+      "schema": "object",
+      "description": "Rendezvous details and status."
+    },
+    "/conversations/{conversationId}": {
+      "schema": "object",
+      "description": "Chat conversations."
+    }
+  }
+}

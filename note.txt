@@ -1,0 +1,52 @@
+
+# **Nom de l’application : Loving**
+
+## **Fonctionnalités principales :**
+
+* **Authentification multi-rôles et profils utilisateurs :**
+  Inscription sécurisée, connexion et gestion complète des profils pour les hommes, les femmes et les administrateurs, incluant la vérification d’âge et des biographies détaillées pour les profils féminins.
+
+* **Système de prise de rendez-vous payants :**
+  Permet aux hommes de proposer des rendez-vous rémunérés aux femmes, avec un calendrier pour gérer les disponibilités et la possibilité pour les femmes d’accepter ou de refuser les propositions.
+
+* **Système de paiement sécurisé et validation :**
+  Intégration avec FedaPay pour les paiements automatisés, ainsi qu’un système manuel permettant à l’administrateur de valider les paiements hors ligne à partir de preuves envoyées par les utilisateurs.
+
+* **Confirmation des rendez-vous avec double preuve :**
+  Mise en place d’un système anti-fraude nécessitant un scan de QR code géolocalisé par la femme et un selfie pris ensemble après le rendez-vous, validé par un administrateur.
+
+* **Messagerie privée avec supervision admin :**
+  Un système de chat similaire à WhatsApp permettant une communication directe entre utilisateurs après confirmation d’un rendez-vous, avec des outils de modération pour l’administrateur.
+
+* **Tableau de bord d’administration complet :**
+  Interface dédiée permettant aux administrateurs de gérer les comptes utilisateurs, valider les paiements et preuves de rendez-vous, surveiller les conversations et consulter les statistiques.
+
+* **Assistant IA pour la rédaction de biographies :**
+  Un outil basé sur l’intelligence artificielle pour aider les utilisatrices à générer des biographies de profil détaillées et engageantes, avec une longueur minimale requise.
+
+---
+
+## **Lignes directrices de design :**
+
+* Le design visuel repose sur les notions de **connexion moderne** et d’**élégance**, avec un thème sombre sophistiqué. La couleur principale, un magenta profond (#CC3383), représente l’identité et les fonctionnalités clés de l’application, évoquant chaleur et engagement.
+
+* La couleur de fond est un charbon sombre légèrement teinté de violet (#231A1E), offrant une base professionnelle et élégante qui met en valeur les éléments de l’interface.
+
+* Une couleur d’accent, un rose-violet vibrant (#EC6BF0), est utilisée pour les éléments interactifs et les mises en avant, assurant une hiérarchie visuelle claire et dynamique.
+
+* Dans certains tableaux de bord :
+
+  * Rose profond (#FF1493) pour les femmes
+  * Orange vif (#FF8C00) pour les hommes
+    Ces couleurs servent à différencier visuellement les sections. Les actions critiques côté admin utilisent des touches de rouge.
+
+* Les titres utilisent la police **Poppins**, une sans-serif géométrique moderne et précise.
+  Le texte courant utilise **Inter**, pour une lisibilité optimale et un rendu neutre.
+
+* Utilisation d’icônes vectorielles minimalistes et cohérentes (style contour avec remplissage lors des interactions) pour une interface intuitive et moderne.
+
+* Design responsive **mobile-first**, avec des layouts en cartes pour les profils, rendez-vous et contenus, garantissant une expérience fluide sur tous les appareils.
+
+* Animations subtiles et transitions fluides (chargement, confirmation de paiement, validation de rendez-vous) pour améliorer l’expérience utilisateur et le feedback visuel.
+
+

@@ -1,0 +1,88 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero-couple",
+      "description": "A stylish couple in a modern, elegant setting, hinting at a successful connection.",
+      "imageUrl": "https://picsum.photos/seed/loving-hero/1920/1080",
+      "imageHint": "stylish couple"
+    },
+    {
+      "id": "trust-avatar-1",
+      "description": "Avatar of a member",
+      "imageUrl": "https://picsum.photos/seed/trust-1/100/100",
+      "imageHint": "man portrait"
+    },
+    {
+      "id": "trust-avatar-2",
+      "description": "Avatar of a member",
+      "imageUrl": "https://picsum.photos/seed/trust-2/100/100",
+      "imageHint": "woman portrait"
+    },
+    {
+      "id": "trust-avatar-3",
+      "description": "Avatar of a member",
+      "imageUrl": "https://picsum.photos/seed/trust-3/100/100",
+      "imageHint": "man portrait"
+    },
+    {
+      "id": "trust-avatar-4",
+      "description": "Avatar of a member",
+      "imageUrl": "https://picsum.photos/seed/trust-4/100/100",
+      "imageHint": "woman portrait"
+    },
+    {
+      "id": "trust-avatar-5",
+      "description": "Avatar of a member",
+      "imageUrl": "https://picsum.photos/seed/trust-5/100/100",
+      "imageHint": "man portrait"
+    },
+    {
+      "id": "trust-avatar-6",
+      "description": "Avatar of a member",
+      "imageUrl": "https://picsum.photos/seed/trust-6/100/100",
+      "imageHint": "woman portrait"
+    },
+    {
+      "id": "trust-avatar-7",
+      "description": "Avatar of a member",
+      "imageUrl": "https://picsum.photos/seed/trust-7/100/100",
+      "imageHint": "man portrait"
+    },
+    {
+      "id": "woman-profile-1",
+      "description": "Portrait of a smiling woman.",
+      "imageUrl": "https://picsum.photos/seed/loving-woman-1/400/533",
+      "imageHint": "smiling woman"
+    },
+    {
+      "id": "woman-profile-2",
+      "description": "Woman in a cityscape.",
+      "imageUrl": "https://picsum.photos/seed/loving-woman-2/400/533",
+      "imageHint": "woman city"
+    },
+    {
+      "id": "woman-profile-3",
+      "description": "Woman enjoying nature.",
+      "imageUrl": "https://picsum.photos/seed/loving-woman-3/400/533",
+      "imageHint": "woman nature"
+    },
+    {
+      "id": "woman-profile-4",
+      "description": "Woman in a cafe.",
+      "imageUrl": "https://picsum.photos/seed/loving-woman-4/400/533",
+      "imageHint": "woman cafe"
+    },
+    {
+      "id": "woman-profile-5",
+      "description": "Artistic shot of a woman.",
+      "imageUrl": "https://picsum.photos/seed/loving-woman-5/400/533",
+      "imageHint": "artistic woman"
+    },
+    {
+      "id": "woman-profile-6",
+      "description": "Woman laughing.",
+      "imageUrl": "https://picsum.photos/seed/loving-woman-6/400/533",
+      "imageHint": "laughing woman"
+    }
+  ]
+}

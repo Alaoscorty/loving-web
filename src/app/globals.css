@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 330 16% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 330 16% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 330 16% 12%;
+    --primary: 326 60% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 330 10% 97%;
+    --secondary-foreground: 330 16% 12%;
+    --muted: 330 10% 96%;
+    --muted-foreground: 330 10% 45%;
+    --accent: 297 81% 67%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 330 10% 90%;
+    --input: 330 10% 90%;
+    --ring: 326 60% 50%;
+    --radius: 1rem;
+    --sidebar-background: 0 0% 99%;
+    --sidebar-foreground: 330 16% 12%;
+    --sidebar-primary: 326 60% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 330 10% 95%;
+    --sidebar-accent-foreground: 326 60% 50%;
+    --sidebar-border: 330 10% 90%;
+    --sidebar-ring: 326 60% 50%;
+    
+    --woman-primary: 339 82% 64%;
+    --man-primary: 33 100% 50%;
+  }
+
+  .dark {
+    --background: 330 16% 8%;
+    --foreground: 330 13% 96%;
+    --card: 330 16% 11%;
+    --card-foreground: 330 13% 96%;
+    --popover: 330 16% 11%;
+    --popover-foreground: 330 13% 96%;
+    --primary: 326 60% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 327 14% 18%;
+    --secondary-foreground: 330 13% 96%;
+    --muted: 327 14% 18%;
+    --muted-foreground: 330 10% 65%;
+    --accent: 297 81% 67%;
+    --accent-foreground: 330 16% 12%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 327 14% 18%;
+    --input: 327 14% 18%;
+    --ring: 297 81% 67%;
+    --sidebar-background: 330 16% 10%;
+    --sidebar-foreground: 330 13% 96%;
+    --sidebar-primary: 326 60% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 327 14% 18%;
+    --sidebar-accent-foreground: 326 60% 55%;
+    --sidebar-border: 327 14% 18%;
+    --sidebar-ring: 297 81% 67%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground transition-colors duration-300;
+  }
+}
+
+/* Custom scrollbar for tabs */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

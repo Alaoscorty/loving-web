@@ -1,0 +1,110 @@
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isLoggedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isLoggedIn() && (
+        request.auth.uid == userId || 
+        (exists(/databases/$(database)/documents/users/$(userId)) && get(/databases/$(database)/documents/users/$(userId)).data.ownerUid == request.auth.uid)
+      );
+    }
+
+    function isAdmin() {
+      return isLoggedIn() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isConversationParticipant(conversationData) {
+      return isLoggedIn() && (
+        request.auth.uid in conversationData.ownerParticipants || 
+        request.auth.uid in conversationData.participants ||
+        isAdmin()
+      );
+    }
+
+    match /users/{userId} {
+      allow read: if isLoggedIn();
+      allow create: if isLoggedIn();
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /withdrawals/{withdrawalId} {
+      allow read: if isLoggedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isLoggedIn();
+      allow update: if isAdmin();
+    }
+
+    match /donations/{donationId} {
+      allow read: if isLoggedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isLoggedIn();
+      allow update: if isAdmin();
+    }
+
+    match /rendezvous/{rendezvousId} {
+      allow read: if isLoggedIn();
+      allow create: if isLoggedIn();
+      allow update: if isLoggedIn();
+    }
+
+    match /notifications/{notificationId} {
+      allow read: if isLoggedIn();
+      allow create: if isLoggedIn();
+      allow update: if isLoggedIn();
+    }
+    
+    match /posts/{postId} {
+      allow read: if isLoggedIn();
+      allow create: if isLoggedIn();
+      allow update, delete: if isLoggedIn();
+    }
+
+    match /stories/{storyId} {
+      allow read: if isLoggedIn();
+      allow create: if isLoggedIn();
+      allow delete: if isLoggedIn();
+    }
+
+    match /games/{gameId} {
+      allow read: if isLoggedIn();
+      allow create: if isLoggedIn();
+      allow update, delete: if isLoggedIn();
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if isLoggedIn();
+      allow create: if isLoggedIn();
+      allow update: if isAdmin();
+    }
+    
+    match /profileRequests/{requestId} {
+      allow read: if isAdmin() || (isLoggedIn() && resource.data.ownerUid == request.auth.uid);
+      allow create: if isLoggedIn();
+      allow update, delete: if isAdmin();
+    }
+
+    match /conversations/{conversationId} {
+      allow read: if isLoggedIn() && isConversationParticipant(resource.data);
+      allow create: if isLoggedIn();
+      allow update: if isLoggedIn() && isConversationParticipant(resource.data);
+
+      match /messages/{messageId} {
+        allow read: if isLoggedIn();
+        allow create: if isLoggedIn();
+        allow update: if isLoggedIn() && (
+          request.auth.uid == resource.data.senderOwnerUid || 
+          isAdmin() || 
+          isConversationParticipant(get(/databases/$(database)/documents/conversations/$(conversationId)).data)
+        );
+        allow delete: if isAdmin() || request.auth.uid == resource.data.senderOwnerUid;
+      }
+    }
+  }
+}
