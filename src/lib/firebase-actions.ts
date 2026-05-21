@@ -12,6 +12,8 @@ import type { UserProfile } from '@/types/user';
 import type { Notification } from '@/types/notification';
 import type { Review } from '@/types/review';
 import type { Message } from '@/types/message';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 export const POINTS_CONVERSION_RATE = 1;
 export const MIN_WITHDRAWAL_POINTS = 2000;
@@ -217,8 +219,14 @@ export async function sendMessage({ firestore, storage, conversationId, senderUi
   let finalImageUrl = imageUrl;
   if (photoFile && storage) {
       const fileRef = ref(storage, `chats/${conversationId}/${uuidv4()}.jpg`);
-      await uploadBytes(fileRef, photoFile);
-      finalImageUrl = await getDownloadURL(fileRef);
+      try {
+        await uploadBytes(fileRef, photoFile);
+        finalImageUrl = await getDownloadURL(fileRef);
+      } catch (e: any) {
+        console.error('Storage upload error (sendMessage):', e);
+        try { errorEmitter.emit('permission-error', new FirestorePermissionError({ path: `chats/${conversationId}`, operation: 'write' })); } catch (_) {}
+        throw e;
+      }
   }
 
   const msgData = { 
@@ -323,8 +331,14 @@ export async function signUpAndCreateProfile({
   if (photoFile) {
     const filePath = `profile-photos/${user.uid}/main-${uuidv4()}.jpg`;
     const fileRef = ref(storage, filePath);
-    await uploadBytes(fileRef, photoFile);
-    photoUrl = await getDownloadURL(fileRef);
+    try {
+      await uploadBytes(fileRef, photoFile);
+      photoUrl = await getDownloadURL(fileRef);
+    } catch (e: any) {
+      console.error('Storage upload error (signUpAndCreateProfile):', e);
+      try { errorEmitter.emit('permission-error', new FirestorePermissionError({ path: filePath, operation: 'write' })); } catch (_) {}
+      throw e;
+    }
   }
 
   const userProfile: UserProfile = {
@@ -611,9 +625,15 @@ export async function updateUserProfile({ firestore, storage, userId, data, phot
   if (photoFile) {
     const filePath = `profile-photos/${userId}/main-${uuidv4()}.jpg`;
     const fileRef = ref(storage, filePath);
-    await uploadBytes(fileRef, photoFile);
-    const photoUrl = await getDownloadURL(fileRef);
-    updateData.photoUrl = photoUrl;
+    try {
+      await uploadBytes(fileRef, photoFile);
+      const photoUrl = await getDownloadURL(fileRef);
+      updateData.photoUrl = photoUrl;
+    } catch (e: any) {
+      console.error('Storage upload error (updateUserProfile):', e);
+      try { errorEmitter.emit('permission-error', new FirestorePermissionError({ path: filePath, operation: 'write' })); } catch (_) {}
+      throw e;
+    }
   }
   
   await updateDoc(doc(firestore, 'users', userId), updateData);
@@ -622,9 +642,15 @@ export async function updateUserProfile({ firestore, storage, userId, data, phot
 export async function uploadSecondaryPhoto({ firestore, storage, userId, file }: { firestore: Firestore; storage: FirebaseStorage; userId: string; file: File; }) {
     const filePath = `profile-photos/${userId}/secondary-${uuidv4()}.jpg`;
     const fileRef = ref(storage, filePath);
-    await uploadBytes(fileRef, file);
-    const photoUrl = await getDownloadURL(fileRef);
-    const photoObj = { url: photoUrl, createdAt: new Date().toISOString() };
+    try {
+      await uploadBytes(fileRef, file);
+      const photoUrl = await getDownloadURL(fileRef);
+    } catch (e: any) {
+      console.error('Storage upload error (uploadSecondaryPhoto):', e);
+      try { errorEmitter.emit('permission-error', new FirestorePermissionError({ path: filePath, operation: 'write' })); } catch (_) {}
+      throw e;
+    }
+    const photoObj = { url: await getDownloadURL(fileRef), createdAt: new Date().toISOString() };
     await updateDoc(doc(firestore, 'users', userId), { secondaryPhotos: arrayUnion(photoObj), lastActive: new Date().toISOString() });
     return photoUrl;
 }
@@ -666,9 +692,15 @@ export async function proposeRendezvous({ firestore, storage, manUid, womanUid, 
     };
     
     if (paymentMethod === 'offline' && paymentProofFile) {
-        const fileRef = ref(storage, `payment-proofs/${uuidv4()}.jpg`);
+      const fileRef = ref(storage, `payment-proofs/${uuidv4()}.jpg`);
+      try {
         await uploadBytes(fileRef, paymentProofFile);
         newRendezvous.paymentProofUrl = await getDownloadURL(fileRef);
+      } catch (e: any) {
+        console.error('Storage upload error (proposeRendezvous paymentProof):', e);
+        try { errorEmitter.emit('permission-error', new FirestorePermissionError({ path: `payment-proofs/`, operation: 'write' })); } catch (_) {}
+        throw e;
+      }
         newRendezvous.paymentStatus = 'waiting_validation';
     } else {
         newRendezvous.paymentStatus = 'paid';
@@ -754,7 +786,13 @@ export async function confirmQrScan({ firestore, rendezvousId, location }: any) 
 export async function uploadSelfieProof({ firestore, storage, rendezvousId, selfieFile }: any) {
   // 1. Upload photo
   const fileRef = ref(storage, `rendezvous-proofs/${rendezvousId}/${uuidv4()}.jpg`);
-  await uploadBytes(fileRef, selfieFile);
+  try {
+    await uploadBytes(fileRef, selfieFile);
+  } catch (e: any) {
+    console.error('Storage upload error (uploadSelfieProof):', e);
+    try { errorEmitter.emit('permission-error', new FirestorePermissionError({ path: `rendezvous-proofs/${rendezvousId}`, operation: 'write' })); } catch (_) {}
+    throw e;
+  }
   const url = await getDownloadURL(fileRef);
   
   // 2. Get Rendezvous Info

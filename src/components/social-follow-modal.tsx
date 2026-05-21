@@ -17,9 +17,9 @@ const TikTokIcon = (props: any) => (
 );
 
 const SOCIAL_LINKS = [
-    { id: 'facebook', label: 'Facebook', icon: Facebook, color: 'bg-[#1877F2]', url: 'https://facebook.com/lovingapp' },
-    { id: 'tiktok', label: 'TikTok', icon: TikTokIcon, color: 'bg-black', url: 'https://tiktok.com/@lovingapp' },
-    { id: 'instagram', label: 'Instagram', icon: Instagram, color: 'bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7]', url: 'https://instagram.com/lovingapp' },
+    { id: 'facebook', label: 'Facebook', icon: Facebook, color: 'bg-[#1877F2]', url: 'https://facebook.com/profile.php?id=61581404536850' },
+    { id: 'tiktok', label: 'TikTok', icon: TikTokIcon, color: 'bg-black', url: 'https://tiktok.com/@beaute_elegante' },
+    { id: 'instagram', label: 'Instagram', icon: Instagram, color: 'bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7]', url: 'https://instagram.com/alaoscorty' },
 ];
 
 export function SocialFollowModal() {

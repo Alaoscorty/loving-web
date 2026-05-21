@@ -224,13 +224,13 @@ export function DashboardSidebar() {
         <div className="px-4 py-4 space-y-4 group-data-[collapsible=icon]:hidden animate-in fade-in duration-1000">
             <h4 className="text-[10px] font-black uppercase text-muted-foreground tracking-[0.2em] px-2">Suivez-nous</h4>
             <div className="flex items-center gap-2 px-1">
-                <a href="https://facebook.com/lovingapp" target="_blank" className="p-2 rounded-xl bg-[#1877F2]/10 text-[#1877F2] hover:bg-[#1877F2] hover:text-white transition-all shadow-sm">
+                <a href="https://facebook.com/profile.php?id=61581404536850" target="_blank" className="p-2 rounded-xl bg-[#1877F2]/10 text-[#1877F2] hover:bg-[#1877F2] hover:text-white transition-all shadow-sm">
                     <Facebook className="w-5 h-5" />
                 </a>
-                <a href="https://tiktok.com/@lovingapp" target="_blank" className="p-2 rounded-xl bg-black/5 text-black hover:bg-black hover:text-white transition-all shadow-sm dark:bg-white/10 dark:text-white dark:hover:bg-white dark:hover:text-black">
+                <a href="https://tiktok.com/@beaute_elegante" target="_blank" className="p-2 rounded-xl bg-black/5 text-black hover:bg-black hover:text-white transition-all shadow-sm dark:bg-white/10 dark:text-white dark:hover:bg-white dark:hover:text-black">
                     <TikTokIcon className="w-5 h-5" />
                 </a>
-                <a href="https://instagram.com/lovingapp" target="_blank" className="p-2 rounded-xl bg-pink-500/10 text-pink-500 hover:bg-pink-500 hover:text-white transition-all shadow-sm">
+                <a href="https://instagram.com/alaoscorty" target="_blank" className="p-2 rounded-xl bg-pink-500/10 text-pink-500 hover:bg-pink-500 hover:text-white transition-all shadow-sm">
                     <Instagram className="w-5 h-5" />
                 </a>
             </div>

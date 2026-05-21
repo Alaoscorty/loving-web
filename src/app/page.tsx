@@ -68,7 +68,7 @@ export default function Home() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 pt-4 md:pt-8 px-6 pb-12">
               <Button size="lg" asChild className="w-full sm:w-auto h-14 md:h-16 px-8 md:px-12 text-lg md:text-xl rounded-full shadow-2xl shadow-primary/40 hover:scale-105 transition-transform duration-300 font-bold bg-primary text-white border-none">
-                <Link href="/login">Créer mon profil</Link>
+                <Link href="/register">Créer mon profil</Link>
               </Button>
               <Button size="lg" variant="outline" asChild className="w-full sm:w-auto h-14 md:h-16 px-8 md:px-12 text-lg md:text-xl rounded-full backdrop-blur-xl border-white/30 text-white hover:bg-white/20 hover:scale-105 transition-all duration-300 font-bold">
                 <Link href="/login">Explorer le club</Link>
@@ -151,19 +151,19 @@ export default function Home() {
             </div>
             
             <div className="flex flex-wrap justify-center gap-6 md:gap-12">
-                <a href="https://facebook.com/lovingapp" target="_blank" className="group flex flex-col items-center gap-3">
+                <a href="https://facebook.com/profile.php?id=61581404536850" target="_blank" className="group flex flex-col items-center gap-3">
                     <div className="w-16 h-16 md:w-20 md:h-20 bg-[#1877F2]/10 rounded-[1.5rem] flex items-center justify-center text-[#1877F2] group-hover:bg-[#1877F2] group-hover:text-white transition-all shadow-xl group-hover:scale-110">
                         <Facebook className="w-8 h-8" />
                     </div>
                     <span className="text-[10px] font-bold uppercase tracking-widest opacity-60 group-hover:opacity-100">Facebook</span>
                 </a>
-                <a href="https://tiktok.com/@lovingapp" target="_blank" className="group flex flex-col items-center gap-3">
+                <a href="https://tiktok.com/@beaute_elegante" target="_blank" className="group flex flex-col items-center gap-3">
                     <div className="w-16 h-16 md:w-20 md:h-20 bg-black/10 rounded-[1.5rem] flex items-center justify-center text-black dark:text-white group-hover:bg-black group-hover:text-white transition-all shadow-xl group-hover:scale-110">
                         <TikTokIcon className="w-8 h-8" />
                     </div>
                     <span className="text-[10px] font-bold uppercase tracking-widest opacity-60 group-hover:opacity-100">TikTok</span>
                 </a>
-                <a href="https://instagram.com/lovingapp" target="_blank" className="group flex flex-col items-center gap-3">
+                <a href="https://instagram.com/alaoscorty" target="_blank" className="group flex flex-col items-center gap-3">
                     <div className="w-16 h-16 md:w-20 md:h-20 bg-pink-500/10 rounded-[1.5rem] flex items-center justify-center text-pink-500 group-hover:bg-pink-500 group-hover:text-white transition-all shadow-xl group-hover:scale-110">
                         <Instagram className="w-8 h-8" />
                     </div>
