@@ -50,3 +50,4 @@
 * Animations subtiles et transitions fluides (chargement, confirmation de paiement, validation de rendez-vous) pour améliorer l’expérience utilisateur et le feedback visuel.
 
 
+clé web push de firestore :BKnz7Hz8KiwfWneCYHgGQo0AlmiRaxzNQeVKt3FbIANgdwk6osk-hk6muhNawNV23C3AsETZEbvVhrrpIy7x22Y

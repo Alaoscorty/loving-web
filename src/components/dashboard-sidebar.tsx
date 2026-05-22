@@ -74,10 +74,34 @@ export function DashboardSidebar() {
   const auth = useAuth();
   const firestore = useFirestore();
   const { userProfile, loading, switchProfile, user } = useUser();
+
   const { toast } = useToast();
+
+  // IMPORTANT: on évite tout comportement “logged out” le temps que Firebase/Firestore finissent de charger l'état auth
+  if (loading) {
+    return (
+      <Sidebar collapsible="icon" variant="sidebar">
+        <SidebarHeader className="flex items-center justify-between p-2">
+          <div className="flex items-center gap-2">
+            <span className="w-8 h-8 rounded-xl bg-muted/50 animate-pulse" />
+            <span className="h-4 w-24 rounded-md bg-muted/50 animate-pulse" />
+          </div>
+        </SidebarHeader>
+        <Separator />
+        <SidebarContent>
+          <div className="p-2 space-y-2">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="h-10 rounded-xl bg-muted/40 animate-pulse" />
+            ))}
+          </div>
+        </SidebarContent>
+      </Sidebar>
+    );
+  }
+
   const userRole = userProfile?.role;
-  
   const isActive = (path: string) => pathname === path;
+
 
   // 1. Compteur de notifications non lues
   const unreadNotificationsQuery = useMemo(() => {
@@ -186,7 +210,8 @@ export function DashboardSidebar() {
           {commonLinks.map((link) => (
             <SidebarMenuItem key={link.href}>
               <SidebarMenuButton asChild isActive={isActive(link.href)} tooltip={link.label}>
-                <Link href={link.href}>
+                <Link href={link.href} rel="noopener">
+
                   <link.icon />
                   <span>{link.label}</span>
                   {link.badge !== undefined && link.badge > 0 && (
