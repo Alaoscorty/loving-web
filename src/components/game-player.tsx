@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { Game } from '@/types/game';
+import type { Game, GameContent, GameResult } from '@/types/game';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, XCircle } from 'lucide-react';
-import type { GameContent } from '@/types/game';
 import { Card, CardContent } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
@@ -14,13 +13,14 @@ import { useToast } from '@/hooks/use-toast';
 import { DialogFooter, DialogClose, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useUser, useFirestore } from '@/firebase';
 import { awardPoints } from '@/lib/firebase-actions';
+import { doc, updateDoc, increment, arrayUnion, getDoc } from 'firebase/firestore';
 
 const QuizPlayer = ({
   content,
   onGameComplete,
 }: {
   content: Extract<GameContent, { gameType: 'quiz' }>;
-  onGameComplete: (points: number) => void;
+  onGameComplete: (points: number, score?: number, maxScore?: number) => void;
 }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<(string | null)[]>(new Array(content.questions.length).fill(null));
@@ -34,10 +34,10 @@ const QuizPlayer = ({
     if (showResults) {
       const points = 10 + (score * 5); // 10 for participation, 5 per correct answer
       if (points > 0) {
-        onGameComplete(points);
+        onGameComplete(points, score, content.questions.length);
       }
     }
-  }, [showResults, score, onGameComplete]);
+  }, [showResults, score, onGameComplete, content.questions.length]);
 
   const currentQuestion = content.questions[currentQuestionIndex];
 
@@ -199,28 +199,60 @@ const gameTitles = {
 }
 
 export function GamePlayer({ game }: { game: Game & { id: string } }) {
-  const { user } = useUser();
+  const { user, userProfile } = useUser();
   const firestore = useFirestore();
   const { toast } = useToast();
 
-  const handleGameCompletion = (points: number) => {
-    if (user && firestore && points > 0) {
-      awardPoints({ firestore, userId: user.uid, points: points });
-      toast({
-        title: `+${points} points !`,
-        description: "Vous avez gagné des points pour avoir joué.",
-      });
+  const handleGameCompletion = async (points: number, score?: number, maxScore?: number) => {
+    if (user && firestore && points > 0 && userProfile) {
+      try {
+        // Award points to player
+        await awardPoints({ firestore, userId: user.uid, points: points });
+        
+        // Record game result for creator to see who played
+        const gameRef = doc(firestore, 'games', game.id);
+        const gameDoc = await getDoc(gameRef);
+        const gameData = gameDoc.data() as Game;
+        const currentResults = gameData?.results || [];
+        
+        const newResult: GameResult = {
+          playerId: user.uid,
+          playerName: userProfile.name,
+          playerPhotoUrl: userProfile.photoUrl,
+          score: score,
+          maxScore: maxScore,
+          points: points,
+          playedAt: new Date().toISOString()
+        };
+        
+        await updateDoc(gameRef, {
+          results: arrayUnion(newResult),
+          totalPlayers: increment(1)
+        });
+        
+        toast({
+          title: `+${points} points !`,
+          description: "Vous avez gagné des points pour avoir joué.",
+        });
+      } catch (error) {
+        console.error('Error saving game result:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Erreur',
+          description: 'Erreur lors de l\'enregistrement du résultat.'
+        });
+      }
     }
   };
 
   const renderGameContent = () => {
     switch (game.gameType) {
       case 'quiz':
-        return <QuizPlayer content={game.content as Extract<GameContent, { gameType: 'quiz' }>} onGameComplete={handleGameCompletion} />;
+        return <QuizPlayer content={game.content as Extract<GameContent, { gameType: 'quiz' }>} onGameComplete={(points, score, maxScore) => handleGameCompletion(points, score, maxScore)} />;
       case 'riddle':
-        return <RiddlePlayer content={game.content as Extract<GameContent, { gameType: 'riddle' }>} onGameComplete={handleGameCompletion} />;
+        return <RiddlePlayer content={game.content as Extract<GameContent, { gameType: 'riddle' }>} onGameComplete={(points) => handleGameCompletion(points)} />;
       case 'poll':
-        return <PollPlayer content={game.content as Extract<GameContent, { gameType: 'poll' }>} onGameComplete={handleGameCompletion} />;
+        return <PollPlayer content={game.content as Extract<GameContent, { gameType: 'poll' }>} onGameComplete={(points) => handleGameCompletion(points)} />;
       default:
         return <p>Ce type de jeu n'est pas supporté.</p>;
     }

@@ -192,16 +192,6 @@ export function DashboardSidebar() {
         { href: '/dashboard/man/browse', label: 'Découvrir', icon: Users },
         { href: '/dashboard/man/rendezvous', label: 'Rendez-vous', icon: CalendarClock, badge: pendingRdvCount },
         { href: '/dashboard/man/my-games', label: 'Mes Jeux', icon: Gamepad2 },
-    ];
-    if (userRole === 'admin') return [
-        { href: '/dashboard/admin/users', label: 'Membres', icon: Users },
-        { href: '/dashboard/admin/withdrawals', label: 'Retraits', icon: Banknote, badge: pendingWithdrawalsCount },
-        { href: '/dashboard/admin/profile-requests', label: 'Profils', icon: UserPlus, badge: profileReqs?.length },
-        { href: '/dashboard/admin/stats', label: 'Stats Globales', icon: BarChart3 },
-    ];
-    return [];
-  }, [userRole, loading, pendingRdvCount, profileReqs?.length, pendingWithdrawalsCount]);
-
 
 
   const handleSignOut = async () => {
@@ -225,7 +215,7 @@ export function DashboardSidebar() {
           {commonLinks.map((link) => (
             <SidebarMenuItem key={link.href}>
               <SidebarMenuButton asChild isActive={isActive(link.href)} tooltip={link.label}>
-                <Link href={link.href} rel="noopener noreferrer">
+                <Link href={link.href} rel="noopener">
 
                   <link.icon />
                   <span>{link.label}</span>
