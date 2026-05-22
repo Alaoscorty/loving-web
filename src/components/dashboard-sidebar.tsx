@@ -1,25 +1,26 @@
-
 'use client';
 
 import { useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-   Bell,
-   BookUser,
-   CalendarClock,
-   Gamepad2,
-   Heart,
-   Home,
-   MessageSquare,
-   Settings,
-   ShieldCheck,
-   Users,
-   Wallet,
-   Sparkles,
-   BarChart3,
-   Verified,
-   Gift,
+  Bell,
+  BookUser,
+  CalendarClock,
+  Gamepad2,
+  Home,
+  MessageSquare,
+  Settings,
+  Users,
+  Wallet,
+  Sparkles,
+  Verified,
+  Gift,
+  Banknote,
+  Info,
+  Power,
+  ChevronUp,
+  UserPlus,
    Banknote,
    ShieldAlert,
    Info,
@@ -164,6 +165,17 @@ export function DashboardSidebar() {
     { href: '/dashboard/settings', label: 'Paramètres', icon: Settings },
   ];
 
+  const adminWithdrawalsQuery = useMemo(() => {
+    if (!firestore || userRole !== 'admin') return null;
+    return query(
+      collection(firestore, 'withdrawals'),
+      where('status', '==', 'pending')
+    );
+  }, [firestore, userRole]);
+
+  const { data: pendingWithdrawals } = useCollection<any>(adminWithdrawalsQuery);
+  const pendingWithdrawalsCount = pendingWithdrawals?.length || 0;
+
   const roleLinks = useMemo(() => {
     if (loading) return [];
     if (userRole === 'woman') return [
@@ -183,11 +195,14 @@ export function DashboardSidebar() {
     ];
     if (userRole === 'admin') return [
         { href: '/dashboard/admin/users', label: 'Membres', icon: Users },
+        { href: '/dashboard/admin/withdrawals', label: 'Retraits', icon: Banknote, badge: pendingWithdrawalsCount },
         { href: '/dashboard/admin/profile-requests', label: 'Profils', icon: UserPlus, badge: profileReqs?.length },
         { href: '/dashboard/admin/stats', label: 'Stats Globales', icon: BarChart3 },
     ];
     return [];
-  }, [userRole, loading, pendingRdvCount, profileReqs?.length]);
+  }, [userRole, loading, pendingRdvCount, profileReqs?.length, pendingWithdrawalsCount]);
+
+
 
   const handleSignOut = async () => {
     await signOutUser(auth);
@@ -210,7 +225,7 @@ export function DashboardSidebar() {
           {commonLinks.map((link) => (
             <SidebarMenuItem key={link.href}>
               <SidebarMenuButton asChild isActive={isActive(link.href)} tooltip={link.label}>
-                <Link href={link.href} rel="noopener">
+                <Link href={link.href} rel="noopener noreferrer">
 
                   <link.icon />
                   <span>{link.label}</span>

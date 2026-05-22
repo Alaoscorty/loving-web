@@ -919,27 +919,34 @@ export async function processWithdrawal({
   const withdrawalRef = doc(firestore, 'withdrawals', withdrawalId);
   const snap = await getDoc(withdrawalRef);
   if (!snap.exists()) return;
-  const data = snap.data();
+  const data: any = snap.data();
+
   const status = approved ? 'processed' : 'rejected';
   await updateDoc(withdrawalRef, {
     status,
     processedAt: new Date().toISOString()
   });
-  if (!approved) {
-    await updateDoc(doc(firestore, 'users', data.userId), {
-      points: increment(data.points)
-    });
-  }
+
+  // createWithdrawalRequest() débite les points immédiatement.
+  // Donc :
+  // - si approuvé => on crédite les points (XP) à l'utilisateur
+  // - si rejeté => on restitue également les points
+  await updateDoc(doc(firestore, 'users', data.userId), {
+    points: increment(data.points),
+    lastActive: new Date().toISOString(),
+  });
+
   await createNotification({
     firestore,
     recipientUid: data.userId,
     title: approved ? "Virement effectué ! ✅" : "Demande de retrait rejetée ❌",
-    message: approved 
-      ? `Votre virement de ${data.amount} FCFA a été traité.`
+    message: approved
+      ? `Votre virement de ${data.amount} FCFA a été traité. Vos ${data.points} XP ont été récupérés sur votre compte.`
       : `Votre demande a été rejetée. Vos ${data.points} points ont été restitués.`,
     type: approved ? 'payment_validated' : 'payment_rejected'
   });
 }
+
 
 export async function markAllNotificationsAsRead({ firestore, userId }: { firestore: Firestore; userId: string }) {
     const q = query(collection(firestore, 'notifications'), where('recipientUid', '==', userId), where('isRead', '==', false));
