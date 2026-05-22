@@ -58,14 +58,17 @@ export function RequestBadgeDialog({ onComplete }: { onComplete: () => void }) {
     if (!userProfile || !firestore || !storage) return;
     setIsLoading(true);
     try {
+      let transactionId: string | undefined;
+
       if (values.paymentMethod === 'fedapay') {
           const payment = await createFedaPayTransaction({
               amount: 15000,
               description: `Badge Bleu Loving - ${userProfile.name}`,
               customerEmail: userProfile.email,
-              customerName: userProfile.name
+              customerName: userProfile.name,
+              reference: `badge-${userProfile.uid}-${Date.now()}`,
           });
-          
+          transactionId = payment.transactionId || payment.id;
           window.open(payment.url, '_blank');
           toast({ title: "Redirection FedaPay...", description: "Finalisez le paiement dans l'onglet qui vient de s'ouvrir." });
       }
@@ -76,6 +79,7 @@ export function RequestBadgeDialog({ onComplete }: { onComplete: () => void }) {
         userId: userProfile.uid,
         paymentMethod: values.paymentMethod,
         paymentProofFile: values.paymentProof?.[0],
+        paymentTransactionId: transactionId,
       });
 
       setShowSuccess(true);
@@ -96,7 +100,7 @@ export function RequestBadgeDialog({ onComplete }: { onComplete: () => void }) {
               <SuccessView 
                 title="Demande transmise !"
                 message={paymentMethod === 'fedapay' 
-                    ? "Votre paiement a été initialisé. Votre badge sera activé dès confirmation automatique." 
+                    ? "Votre paiement a été initialisé. Votre badge sera activé dès confirmation du paiement FedaPay." 
                     : "L'administrateur vérifiera votre preuve de paiement manuelle sous peu."}
                 onBack={onComplete}
               />

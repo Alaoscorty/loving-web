@@ -11,16 +11,43 @@ import { Share2, Copy, Users, Gift, Trophy, CheckCircle2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 
+import { getReferralStats } from '@/lib/firebase-actions';
+import { useEffect } from 'react';
 export default function ReferralPage() {
   const { userProfile } = useUser();
   const firestore = useFirestore();
   const { toast } = useToast();
   const [isCopying, setIsCopying] = useState(false);
 
+  const [referralStats, setReferralStats] = useState({ totalReferrals: 0, validatedReferrals: 0 });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      if (userProfile?.uid) {
+        const stats = await getReferralStats({ firestore, userId: userProfile.uid });
+        setReferralStats(stats);
+        
+        // Compléter la quête si 5 parrainés validés sont atteints
+        if (stats.validatedReferrals >= 5 && userProfile && !userProfile.completedQuests?.includes('ambassador_badge')) {
+          try {
+            await completeQuest({ firestore, userId: userProfile.uid, questId: 'ambassador_badge', points: 100 });
+          } catch (e) {
+            console.error('Erreur lors de la complétude de la quête:', e);
+          }
+        }
+      }
+      setIsLoading(false);
+    };
+
+    fetchStats();
+  }, [userProfile?.uid, firestore, userProfile?.completedQuests]);
   const referralCode = userProfile?.uid?.slice(0, 8).toUpperCase() || 'LOVING-2024';
-  const referralLink = `https://loving-app.africa/register?ref=${referralCode}`;
+  const referralLink = `https://loving-web-five.vercel.app/register?ref=${referralCode}`;
 
   const handleCopy = () => {
+  const progressPercentage = Math.min((referralStats.validatedReferrals / 5) * 100, 100);
+  const isAmbassador = referralStats.validatedReferrals >= 5;
     setIsCopying(true);
     navigator.clipboard.writeText(referralLink);
     toast({
@@ -41,14 +68,17 @@ export default function ReferralPage() {
     { title: "Ils s'inscrivent", desc: "Vos amis créent un profil complet sur Loving.", icon: <Users className="w-5 h-5" /> },
     { title: "Gagnez des points", desc: "Recevez +20 XP dès qu'un ami valide son premier RDV.", icon: <Gift className="w-5 h-5" /> },
   ];
-
+    { title: "Gagnez des points", desc: "Recevez +20 XP par parrain, +100 bonus si 5 RDV validés.", icon: <Gift className="w-5 h-5" /> },
   return (
     <div className="flex-1 p-4 md:p-8 max-w-4xl mx-auto w-full space-y-8 animate-in fade-in duration-500">
       <header className="space-y-2">
         <h1 className="text-4xl font-bold tracking-tighter font-headline text-primary">Parrainage Loving</h1>
         <p className="text-muted-foreground text-lg">Invitez vos amis et soyez récompensé pour chaque nouvelle connexion.</p>
       </header>
-
+        <p className="text-muted-foreground text-lg">
+          Invitez vos amis et soyez récompensé pour chaque nouvelle connexion.
+          {isAmbassador && <span className="text-primary font-bold ml-2">🎉 Vous êtes Ambassadeur !</span>}
+        </p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {steps.map((step, i) => (
             <Card key={i} className="border-none bg-card/40 backdrop-blur-md rounded-3xl overflow-hidden shadow-xl">
@@ -95,23 +125,38 @@ export default function ReferralPage() {
             <AlertDescription className="text-sm">
                 Parrainez 5 amis pour débloquer le badge exclusif <span className="font-bold text-primary">"Ambassadeur Loving"</span> et gagner 100 XP bonus.
             </AlertDescription>
-          </Alert>
+                {isAmbassador ? (
+                  <span>Félicitations ! Vous avez débloqué le badge exclusif <span className="font-bold">"Ambassadeur Loving"</span> et gagné 100 XP bonus. 🎁</span>
+                ) : (
+                  <span>Parrainez 5 amis avec RDV validé pour débloquer le badge exclusif <span className="font-bold">"Ambassadeur Loving"</span> et gagner 100 XP bonus.</span>
+                )}
 
           <div className="space-y-3">
             <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-muted-foreground">
                 <span>Progression : 0 / 5 amis</span>
                 <span>0%</span>
-            </div>
-            <Progress value={0} className="h-3 rounded-full" />
+                <span>Progression : {referralStats.validatedReferrals} / 5 amis (RDV validés)</span>
+                <span>{Math.round(progressPercentage)}%</span>
           </div>
-        </CardContent>
+            <Progress value={progressPercentage} className="h-3 rounded-full" />
       </Card>
+
+          {referralStats.totalReferrals > 0 && (
+            <div className="pt-4 border-t border-white/10">
+              <p className="text-sm text-muted-foreground mb-2">
+                <span className="font-semibold">Total d'inscrits :</span> {referralStats.totalReferrals}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                <span className="font-semibold">Amis avec RDV validés :</span> {referralStats.validatedReferrals}
+              </p>
+            </div>
+          )}
 
       <footer className="text-center pt-8">
         <p className="text-xs text-muted-foreground italic">
             * Les points sont crédités une fois que votre ami a complété son premier rendez-vous validé par un selfie.
         </p>
-      </footer>
+            * Les points (+20 XP par ami) sont crédités dès que votre ami complète son premier rendez-vous validé. Débloquez le badge Ambassadeur avec 5 amis validés (+100 XP bonus).
     </div>
   );
 }

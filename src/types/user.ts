@@ -36,11 +36,16 @@ export interface UserProfile {
 
     // Premium / Blue Badge
     isVerified?: boolean;
-    verificationStatus?: 'none' | 'pending' | 'verified' | 'rejected';
+    verificationStatus?: 'none' | 'pending' | 'pending_payment' | 'verified' | 'rejected';
     verificationExpiresAt?: string;
     verificationProofUrl?: string;
     verificationRejectionReason?: string;
+    verificationPaymentTransactionId?: string;
     renewalReminderSent?: boolean;
+
+    // Referral System
+    referralCode?: string; // Code de parrainage unique
+    referredBy?: string | null; // UID du parraineur (null si pas parrainé)
 
     photoReminderSent?: boolean;
     

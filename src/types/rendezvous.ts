@@ -14,6 +14,7 @@ export interface Rendezvous {
     paymentMethod?: 'fedapay' | 'offline';
     paymentStatus?: 'pending' | 'paid' | 'waiting_validation' | 'rejected';
     paymentProofUrl?: string;
+    paymentTransactionId?: string;
 
     // For post-rendezvous flow
     qrCodeScanned?: boolean;

@@ -11,6 +11,7 @@ import { Calendar as CalendarIcon, Loader2, CreditCard, Banknote, AlertCircle, I
 import { cn } from '@/lib/utils';
 import { useUser, useFirestore, useStorage } from '@/firebase';
 import { proposeRendezvous, RENDEZVOUS_FEE_FCFA, RENDEZVOUS_FEE_XP } from '@/lib/firebase-actions';
+import { createFedaPayTransaction } from '@/lib/fedapay';
 import { useToast } from '@/hooks/use-toast';
 import { SuccessView } from './success-view';
 
@@ -87,6 +88,20 @@ export function ProposeRendezvousDialog({ womanProfile, onProposalSent }: Props)
       const combinedDate = new Date(values.proposedDate);
       combinedDate.setHours(hours, minutes);
 
+      let transactionId: string | undefined;
+      if (values.paymentMethod === 'fedapay') {
+        const payment = await createFedaPayTransaction({
+          amount: RENDEZVOUS_FEE_FCFA,
+          description: `Frais de RDV Loving avec ${womanProfile.name}`,
+          customerEmail: user.email || '',
+          customerName: userProfile?.name || 'Client Loving',
+          reference: `rdv-${user.uid}-${womanProfile.id}-${Date.now()}`,
+        });
+        transactionId = payment.transactionId || payment.id;
+        window.open(payment.url, '_blank');
+        toast({ title: 'Redirection FedaPay...', description: 'Finalisez le paiement dans l’onglet qui vient de s’ouvrir.' });
+      }
+
       await proposeRendezvous({
         firestore,
         storage,
@@ -99,6 +114,7 @@ export function ProposeRendezvousDialog({ womanProfile, onProposalSent }: Props)
         },
         paymentMethod: values.paymentMethod,
         paymentProofFile: values.paymentProof?.[0],
+        paymentTransactionId: transactionId,
       });
 
       setShowSuccess(true);

@@ -523,16 +523,20 @@ export async function markNotificationAsRead({ firestore, notificationId }: { fi
   await updateDoc(doc(firestore, 'notifications', notificationId), { isRead: true });
 }
 
-export async function requestVerification({ firestore, storage, userId, paymentMethod, paymentProofFile }: any) {
+export async function requestVerification({ firestore, storage, userId, paymentMethod, paymentProofFile, paymentTransactionId }: any) {
     const userRef = doc(firestore, 'users', userId);
     const updateData: any = {
-        verificationStatus: 'pending',
+        verificationStatus: paymentMethod === 'fedapay' ? 'pending_payment' : 'pending',
         verificationRejectionReason: null
     };
 
     if (paymentMethod === 'offline' && paymentProofFile) {
         const fileRef = ref(storage, `verification-proofs/${userId}/${uuidv4()}.jpg`);
         updateData.verificationProofUrl = await uploadFileAndGetUrl(fileRef, paymentProofFile, 'requestVerification proof');
+    }
+
+    if (paymentMethod === 'fedapay' && paymentTransactionId) {
+        updateData.verificationPaymentTransactionId = paymentTransactionId;
     }
 
     await updateDoc(userRef, updateData);
@@ -674,7 +678,7 @@ export async function deleteSecondaryPhoto({ firestore, storage, userId, photoUr
     }
 }
 
-export async function proposeRendezvous({ firestore, storage, manUid, womanUid, data, paymentMethod, paymentProofFile }: any) {
+export async function proposeRendezvous({ firestore, storage, manUid, womanUid, data, paymentMethod, paymentProofFile, paymentTransactionId }: any) {
     const userRef = doc(firestore, 'users', manUid);
     const userDoc = await getDoc(userRef);
     const userProfile = userDoc.data() as UserProfile;
@@ -708,9 +712,18 @@ export async function proposeRendezvous({ firestore, storage, manUid, womanUid, 
         try { errorEmitter.emit('permission-error', new FirestorePermissionError({ path: `payment-proofs/`, operation: 'write' })); } catch (_) {}
         throw e;
       }
-        newRendezvous.paymentStatus = 'waiting_validation';
+      newRendezvous.paymentStatus = 'waiting_validation';
+    } else if (paymentMethod === 'fedapay') {
+      newRendezvous.paymentStatus = 'pending';
+      if (paymentTransactionId) {
+        newRendezvous.paymentTransactionId = paymentTransactionId;
+      }
     } else {
-        newRendezvous.paymentStatus = 'paid';
+      newRendezvous.paymentStatus = 'paid';
+    }
+
+    if (paymentMethod === 'fedapay' && !paymentTransactionId) {
+      newRendezvous.paymentStatus = 'pending';
     }
 
     const docRef = await addDoc(rdvCollectionRef, newRendezvous);
@@ -1104,10 +1117,44 @@ export async function transferXp({ firestore, fromUserId, toUserId, amount }: an
     await batch.commit();
 
     await createNotification({
-        firestore,
-        recipientUid: toUserId,
-        title: "Cadeau XP reçu ! 🎁",
-        message: `${fromData.name} vous a envoyé ${amount} XP.`,
-        type: 'payment_validated'
+      firestore,
+      recipientUid: toUserId,
+      title: "Cadeau XP reçu ! 🎁",
+      message: `${fromData.name} vous a envoyé ${amount} XP.`,
+      type: 'payment_validated'
     });
-}
+
+  }
+
+  export async function getReferralStats({ firestore, userId }: { firestore: Firestore; userId: string }): Promise<{ totalReferrals: number; validatedReferrals: number }> {
+      try {
+        // Compter tous les utilisateurs parrainés par cet utilisateur
+        const referralsQuery = query(
+          collection(firestore, 'users'),
+          where('referredBy', '==', userId)
+        );
+        const referralsSnap = await getDocs(referralsQuery);
+        const totalReferrals = referralsSnap.size;
+
+        // Compter les utilisateurs parrainés qui ont complété un RDV validé
+        let validatedReferrals = 0;
+        for (const doc of referralsSnap.docs) {
+          const userProfile = doc.data() as UserProfile;
+          // Vérifier si cet utilisateur a au moins un RDV validé
+          const rdvQuery = query(
+            collection(firestore, 'rendezvous'),
+            where('womanUid', '==', userProfile.uid),
+            where('selfieValidationStatus', '==', 'validated')
+          );
+          const rdvSnap = await getDocs(rdvQuery);
+          if (rdvSnap.size > 0) {
+            validatedReferrals++;
+          }
+        }
+
+        return { totalReferrals, validatedReferrals };
+      } catch (error) {
+        console.error('Erreur lors de la récupération des stats de parrainage:', error);
+        return { totalReferrals: 0, validatedReferrals: 0 };
+      }
+    }
